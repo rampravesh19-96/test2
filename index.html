@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+
+        }
+        .popup{
+            height: 400px;
+            width: 70%;
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="popup"></div>
+    </div>
+</body>
+</html>
+
+
+var myObject = {
+    foo: "bar",
+    
+    func: function() {
+      var self = this;
+      console.log("outer func: this.foo = " + this.foo); 
+      console.log("outer func: self.foo = " + self.foo); 
+      (function() {
+        console.log("inner func: this.foo = " + this.foo); 
+        console.log("inner func: self.foo = " + self.foo); 
+      }());
+    }
+  };
+  
+  myObject.func();
+  
+  //"outer func: this.foo = bar" '
+  //"outer func: self.foo = undefined"
+  //inner func: this.foo = bar" 
+  //inner func: this.foo = undefined"
+  
+  function anagram(str1,str2){
+      if(str1.length===str2.length){
+          for(let i=0;i<str1.length;i++){
+              if(!str2.includes(str1[i)){
+                  return "not anagram"
+              }      
+          }
+          return "anagram"
+      }
+      
+  }
+  
+  function getData(a,...spread){
+      
+  }
+  getData(1,2,3)
+  
+    body{
+      display:flex;
+      justify-content:center;
+      align-item:center
+    }
+  .modelpopup{
+      position:fixed;
+      top:0;
+      left:0;
+      display:none;
+  }
+  .modelpopup.modelpopup2{
+      display : block;
+  }
+  
+  
+  
