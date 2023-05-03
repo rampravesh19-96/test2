@@ -1,61 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { apiAction } from './redux/redux';
-import Card from './Card';
-import "./App.css"
-import {useNavigate } from 'react-router-dom';
-import Header from './Header';
+import {React,useApiData, useState, useMemo, useCallback,useDispatch, useSelector,apiAction,Card,useNavigate,DashboardHeader,search,sorting} from "./imports"
 
-const search = (items=[], query, queryList=["title","description","category"]) => items.filter(item => queryList.some(key => item[key].toLowerCase().indexOf(query.toLowerCase()) !== -1));
+function Dashboard3() {
+  const data = useApiData();
+  const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [orderBy, setOrderBy] = useState('asc');
+  const navigate = useNavigate();
 
-function Dashboard(props) {
-  const data = useSelector(state => state.apiReducer)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const [tempData,setTempData] = useState([])
-  const [opData,setOpData] = useState(tempData)
-  const [searchQuery,setSearchQuery] = useState('')
+  const filteredData = useMemo(() => {
+    return search(data.data || [], query);
+  }, [data.data, query]);
 
-  useEffect(()=>{
-    dispatch(apiAction())
-  },[dispatch])
+  const sortedData = useMemo(() => {
+    return sorting(filteredData, sortBy, orderBy === 'asc');
+  }, [filteredData, sortBy, orderBy]);
 
-  useEffect(()=>{
-    setTempData(data.data)
-  },[data])
-  useEffect(()=>{
-    setOpData(tempData)
-  },[tempData])
+  const handleSearch = useCallback(
+    e => {
+      setQuery(e.target.value);
+    },
+    [setQuery]
+  );
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(opData);
-    const searchedData = search(tempData,searchQuery)
-    console.log(searchedData);
-    setOpData(searchedData)
-}
+  const handleSearchSubmit = useCallback(
+    e => {
+      e.preventDefault();
+      setQuery(e.target.search.value);
+    },
+    [setQuery]
+  );
 
+  const handleClick = useCallback(
+    id => {
+      navigate(`${id}`);
+    },
+    [navigate]
+  );
 
+  const handleSorting = useCallback(
+    (sortBy, isAscending = true) => {
+      setSortBy(sortBy);
+      setOrderBy(isAscending ? 'asc' : 'desc');
+    },
+    [setSortBy, setOrderBy]
+  );
+  
 
   return (
     <main>
-        <Header handleSubmit={handleSubmit} setSearchQuery={setSearchQuery}/>
-        {/* <div className="header">
-            <div className="logo"><h2>Logo</h2></div>
-            <div className="search-bar">
-                <form onSubmit={handleSubmit}>
-                    <input type="text" onChange={(e)=>{setSearchQuery(e.target.value)}}/>
-                    <input type="submit" value="Search" />
-                </form>
-            </div>
-            <div className="sorting"></div>
-        </div> */}
-        <div className='container'>
-            {data.loading?<h2>Loading</h2>:opData.map(item=><div className='card' key={item.id} onClick={()=>{navigate(`${item.id}`)}}><Card item={item}/></div>)}
-        </div>
-    </main>
+      <DashboardHeader
+        title="Dashboard 3"
+        searchPlaceholder="Search by title or description"
+        handleSearchSubmit={handleSearchSubmit}
+        handleSearch={handleSearch}
+        handleSorting={handleSorting}
+        sortBy={sortBy}
+        orderBy={orderBy}
+      />
 
+      <div className="container">
+        {sortedData.map(item => (
+          <Card key={item.id} item={item} handleClick={() => handleClick(item.id)} />
+        ))}
+      </div>
+    </main>
   );
 }
 
-export default Dashboard;
+export default Dashboard3;
